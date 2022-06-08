@@ -23,7 +23,12 @@ void DelayMs(uint32_t ms){ uint32_t tickStart = msTicks;
 
 //--------------------------------------------------------------------------------------------------------------------//
 void Sysinit(void){
-  SysTick_Config(SystemCoreClock / 1000);   //1ms
+	if (SysTick_Config(SystemCoreClock / 1000)){  //1ms
+		while (1);		/* Capture error */ 
+	}
+	NVIC_SetPriority (SysTick_IRQn,0);
+	EthInit();
+
   
 }
 

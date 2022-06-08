@@ -1,64 +1,6 @@
-/**
-  ******************************************************************************
-  * @file    stm32f4x7_eth.c
-  * @author  MCD Application Team
-  * @version V1.1.0
-  * @date    31-July-2013
-  * @brief   This file is the low level driver for STM32F4x7xx Ethernet Controller.
-  *          This driver does not include low level functions for PTP time-stamp.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT 2013 STMicroelectronics</center></h2>
-  *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *
-  ******************************************************************************
-  */
-
-/* Includes ------------------------------------------------------------------*/
-#include "stm32f429_eth.h"
-#include "stm32f4xx_rcc.h"
-#include "LAN8742A.h"
+#include "lan87xxa.h"
 #include <string.h>
 
-
-/** @defgroup ETH_Private_TypesDefinitions
-* @{
-*/ 
-/**
-* @}
-*/ 
-
-
-/** @defgroup ETH_Private_Defines
-* @{
-*/ 
-
-/**
-* @}
-*/
-
-/** @defgroup ETH_Private_Macros
-* @{
-*/ 
-/**
-* @}
-*/
-
-/** @defgroup ETH_Private_Variables
-* @{
-*/ 
 __align(4) ETH_DMADESCTypeDef  DMARxDscrTab[ETH_RXBUFNB];/* Ethernet Rx MA Descriptor */
 __align(4) ETH_DMADESCTypeDef  DMATxDscrTab[ETH_TXBUFNB];/* Ethernet Tx DMA Descriptor */
 __align(4) uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE]; /* Ethernet Receive Buffer */
@@ -74,21 +16,6 @@ ETH_DMA_Rx_Frame_infos RX_Frame_Descriptor;
 __IO ETH_DMA_Rx_Frame_infos *DMA_RX_FRAME_infos;
 __IO uint32_t Frame_Rx_index;
 
-
-/**
-* @}
-*/
-
-/** @defgroup ETH_Private_FunctionPrototypes
-* @{
-*/ 
-/**
-* @}
-*/
-
-/** @defgroup ETH_Private_Functions
-* @{
-*/
 
 #ifndef USE_Delay
 /**
@@ -109,23 +36,6 @@ void ETH_Delay(__IO uint32_t nCount)
 /******************************************************************************/
 /*                           Global ETH MAC/DMA functions                     */
 /******************************************************************************/
-
-/**
-  * @brief  De-initializes the ETHERNET peripheral registers to their default reset values.
-  * @param  None 
-  * @retval None
-  */
-void ETH_DeInit(void)
-{
-  RCC_AHB1PeriphResetCmd(RCC_AHB1Periph_ETH_MAC, ENABLE);
-  RCC_AHB1PeriphResetCmd(RCC_AHB1Periph_ETH_MAC, DISABLE);
-}
-
-/**
-  * @brief  Fills each ETH_InitStruct member with its default value.
-  * @param  ETH_InitStruct: pointer to a ETH_InitTypeDef structure which will be initialized.
-  * @retval None
-  */
 void ETH_StructInit(ETH_InitTypeDef* ETH_InitStruct)
 {
   /* ETH_InitStruct members default value */
@@ -239,54 +149,6 @@ uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress)
   RCC_ClocksTypeDef  rcc_clocks;
   uint32_t hclk = 60000000;
   __IO uint32_t timeout = 0, err = ETH_SUCCESS;
-  /* Check the parameters */
-  /* MAC --------------------------*/ 
-  assert_param(IS_ETH_AUTONEGOTIATION(ETH_InitStruct->ETH_AutoNegotiation));
-  assert_param(IS_ETH_WATCHDOG(ETH_InitStruct->ETH_Watchdog));
-  assert_param(IS_ETH_JABBER(ETH_InitStruct->ETH_Jabber));
-  assert_param(IS_ETH_INTER_FRAME_GAP(ETH_InitStruct->ETH_InterFrameGap));
-  assert_param(IS_ETH_CARRIER_SENSE(ETH_InitStruct->ETH_CarrierSense));
-  assert_param(IS_ETH_SPEED(ETH_InitStruct->ETH_Speed));
-  assert_param(IS_ETH_RECEIVE_OWN(ETH_InitStruct->ETH_ReceiveOwn));
-  assert_param(IS_ETH_LOOPBACK_MODE(ETH_InitStruct->ETH_LoopbackMode));
-  assert_param(IS_ETH_DUPLEX_MODE(ETH_InitStruct->ETH_Mode));
-  assert_param(IS_ETH_CHECKSUM_OFFLOAD(ETH_InitStruct->ETH_ChecksumOffload));
-  assert_param(IS_ETH_RETRY_TRANSMISSION(ETH_InitStruct->ETH_RetryTransmission));
-  assert_param(IS_ETH_AUTOMATIC_PADCRC_STRIP(ETH_InitStruct->ETH_AutomaticPadCRCStrip));
-  assert_param(IS_ETH_BACKOFF_LIMIT(ETH_InitStruct->ETH_BackOffLimit));
-  assert_param(IS_ETH_DEFERRAL_CHECK(ETH_InitStruct->ETH_DeferralCheck));
-  assert_param(IS_ETH_RECEIVE_ALL(ETH_InitStruct->ETH_ReceiveAll));
-  assert_param(IS_ETH_SOURCE_ADDR_FILTER(ETH_InitStruct->ETH_SourceAddrFilter));
-  assert_param(IS_ETH_CONTROL_FRAMES(ETH_InitStruct->ETH_PassControlFrames));
-  assert_param(IS_ETH_BROADCAST_FRAMES_RECEPTION(ETH_InitStruct->ETH_BroadcastFramesReception));
-  assert_param(IS_ETH_DESTINATION_ADDR_FILTER(ETH_InitStruct->ETH_DestinationAddrFilter));
-  assert_param(IS_ETH_PROMISCUOUS_MODE(ETH_InitStruct->ETH_PromiscuousMode));
-  assert_param(IS_ETH_MULTICAST_FRAMES_FILTER(ETH_InitStruct->ETH_MulticastFramesFilter));
-  assert_param(IS_ETH_UNICAST_FRAMES_FILTER(ETH_InitStruct->ETH_UnicastFramesFilter));
-  assert_param(IS_ETH_PAUSE_TIME(ETH_InitStruct->ETH_PauseTime));
-  assert_param(IS_ETH_ZEROQUANTA_PAUSE(ETH_InitStruct->ETH_ZeroQuantaPause));
-  assert_param(IS_ETH_PAUSE_LOW_THRESHOLD(ETH_InitStruct->ETH_PauseLowThreshold));
-  assert_param(IS_ETH_UNICAST_PAUSE_FRAME_DETECT(ETH_InitStruct->ETH_UnicastPauseFrameDetect));
-  assert_param(IS_ETH_RECEIVE_FLOWCONTROL(ETH_InitStruct->ETH_ReceiveFlowControl));
-  assert_param(IS_ETH_TRANSMIT_FLOWCONTROL(ETH_InitStruct->ETH_TransmitFlowControl));
-  assert_param(IS_ETH_VLAN_TAG_COMPARISON(ETH_InitStruct->ETH_VLANTagComparison));
-  assert_param(IS_ETH_VLAN_TAG_IDENTIFIER(ETH_InitStruct->ETH_VLANTagIdentifier));
-  /* DMA --------------------------*/
-  assert_param(IS_ETH_DROP_TCPIP_CHECKSUM_FRAME(ETH_InitStruct->ETH_DropTCPIPChecksumErrorFrame));
-  assert_param(IS_ETH_RECEIVE_STORE_FORWARD(ETH_InitStruct->ETH_ReceiveStoreForward));
-  assert_param(IS_ETH_FLUSH_RECEIVE_FRAME(ETH_InitStruct->ETH_FlushReceivedFrame));
-  assert_param(IS_ETH_TRANSMIT_STORE_FORWARD(ETH_InitStruct->ETH_TransmitStoreForward));
-  assert_param(IS_ETH_TRANSMIT_THRESHOLD_CONTROL(ETH_InitStruct->ETH_TransmitThresholdControl));
-  assert_param(IS_ETH_FORWARD_ERROR_FRAMES(ETH_InitStruct->ETH_ForwardErrorFrames));
-  assert_param(IS_ETH_FORWARD_UNDERSIZED_GOOD_FRAMES(ETH_InitStruct->ETH_ForwardUndersizedGoodFrames));
-  assert_param(IS_ETH_RECEIVE_THRESHOLD_CONTROL(ETH_InitStruct->ETH_ReceiveThresholdControl));
-  assert_param(IS_ETH_SECOND_FRAME_OPERATE(ETH_InitStruct->ETH_SecondFrameOperate));
-  assert_param(IS_ETH_ADDRESS_ALIGNED_BEATS(ETH_InitStruct->ETH_AddressAlignedBeats));
-  assert_param(IS_ETH_FIXED_BURST(ETH_InitStruct->ETH_FixedBurst));
-  assert_param(IS_ETH_RXDMA_BURST_LENGTH(ETH_InitStruct->ETH_RxDMABurstLength));
-  assert_param(IS_ETH_TXDMA_BURST_LENGTH(ETH_InitStruct->ETH_TxDMABurstLength));
-  assert_param(IS_ETH_DMA_DESC_SKIP_LENGTH(ETH_InitStruct->ETH_DescriptorSkipLength));
-  assert_param(IS_ETH_DMA_ARBITRATION_ROUNDROBIN_RXTX(ETH_InitStruct->ETH_DMAArbitration));
   /*-------------------------------- MAC Config ------------------------------*/
   /*---------------------- ETHERNET MACMIIAR Configuration -------------------*/
   /* Get the ETHERNET MACMIIAR value */
@@ -671,8 +533,6 @@ void ETH_Stop(void)
 void ETH_MACTransmissionCmd(FunctionalState NewState)
 { 
   __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
   
   if (NewState != DISABLE)
   {
@@ -701,8 +561,6 @@ void ETH_MACTransmissionCmd(FunctionalState NewState)
 void ETH_MACReceptionCmd(FunctionalState NewState)
 { 
   __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
 
   if (NewState != DISABLE)
   {
@@ -769,8 +627,6 @@ void ETH_InitiatePauseControlFrame(void)
 void ETH_BackPressureActivationCmd(FunctionalState NewState)   
 { 
   __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
   
   if (NewState != DISABLE)
   {
@@ -806,8 +662,6 @@ void ETH_BackPressureActivationCmd(FunctionalState NewState)
 FlagStatus ETH_GetMACFlagStatus(uint32_t ETH_MAC_FLAG)
 {
   FlagStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ETH_MAC_GET_FLAG(ETH_MAC_FLAG)); 
   if ((ETH->MACSR & ETH_MAC_FLAG) != (uint32_t)RESET)
   {
     bitstatus = SET;
@@ -833,8 +687,6 @@ FlagStatus ETH_GetMACFlagStatus(uint32_t ETH_MAC_FLAG)
 ITStatus ETH_GetMACITStatus(uint32_t ETH_MAC_IT)
 {
   ITStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ETH_MAC_GET_IT(ETH_MAC_IT)); 
   if ((ETH->MACSR & ETH_MAC_IT) != (uint32_t)RESET)
   {
     bitstatus = SET;
@@ -859,9 +711,6 @@ ITStatus ETH_GetMACITStatus(uint32_t ETH_MAC_IT)
   */
 void ETH_MACITConfig(uint32_t ETH_MAC_IT, FunctionalState NewState)
 {
-  /* Check the parameters */
-  assert_param(IS_ETH_MAC_IT(ETH_MAC_IT));
-  assert_param(IS_FUNCTIONAL_STATE(NewState));  
   
   if (NewState != DISABLE)
   {
@@ -889,8 +738,6 @@ void ETH_MACITConfig(uint32_t ETH_MAC_IT, FunctionalState NewState)
 void ETH_MACAddressConfig(uint32_t MacAddr, uint8_t *Addr)
 {
   uint32_t tmpreg;
-  /* Check the parameters */
-  assert_param(IS_ETH_MAC_ADDRESS0123(MacAddr));
   
   /* Calculate the selected MAC address high register */
   tmpreg = ((uint32_t)Addr[5] << 8) | (uint32_t)Addr[4];
@@ -917,8 +764,6 @@ void ETH_MACAddressConfig(uint32_t MacAddr, uint8_t *Addr)
 void ETH_GetMACAddress(uint32_t MacAddr, uint8_t *Addr)
 {
   uint32_t tmpreg;
-  /* Check the parameters */
-  assert_param(IS_ETH_MAC_ADDRESS0123(MacAddr));
   
   /* Get the selected MAC address high register */
   tmpreg =(*(__IO uint32_t *) (ETH_MAC_ADDR_HBASE + MacAddr));
@@ -949,11 +794,7 @@ void ETH_GetMACAddress(uint32_t MacAddr, uint8_t *Addr)
   */
 void ETH_MACAddressPerfectFilterCmd(uint32_t MacAddr, FunctionalState NewState)
 {
-  __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_ETH_MAC_ADDRESS123(MacAddr));
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
-  
+  __IO uint32_t tmpreg = 0;  
   if (NewState != DISABLE)
   {
     /* Enable the selected ETHERNET MAC address for perfect filtering */
@@ -989,11 +830,7 @@ void ETH_MACAddressPerfectFilterCmd(uint32_t MacAddr, FunctionalState NewState)
   */
 void ETH_MACAddressFilterConfig(uint32_t MacAddr, uint32_t Filter)
 {
-  __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_ETH_MAC_ADDRESS123(MacAddr));
-  assert_param(IS_ETH_MAC_ADDRESS_FILTER(Filter));
-  
+  __IO uint32_t tmpreg = 0;  
   if (Filter != ETH_MAC_AddressFilter_DA)
   {
     /* The selected ETHERNET MAC address is used to compare with the SA fields of the
@@ -1034,9 +871,6 @@ void ETH_MACAddressFilterConfig(uint32_t MacAddr, uint32_t Filter)
 void ETH_MACAddressMaskBytesFilterConfig(uint32_t MacAddr, uint32_t MaskByte)
 {
   __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_ETH_MAC_ADDRESS123(MacAddr));
-  assert_param(IS_ETH_MAC_ADDRESS_MASK(MaskByte));
   
   /* Clear MBC bits in the selected MAC address  high register */
   (*(__IO uint32_t *) (ETH_MAC_ADDR_HBASE + MacAddr)) &=(~(uint32_t)ETH_MACA1HR_MBC);
@@ -1411,8 +1245,6 @@ void ETH_DMATxDescChainInit(ETH_DMADESCTypeDef *DMATxDescTab, uint8_t* TxBuff, u
 FlagStatus ETH_GetDMATxDescFlagStatus(ETH_DMADESCTypeDef *DMATxDesc, uint32_t ETH_DMATxDescFlag)
 {
   FlagStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ETH_DMATxDESC_GET_FLAG(ETH_DMATxDescFlag));
   
   if ((DMATxDesc->Status & ETH_DMATxDescFlag) != (uint32_t)RESET)
   {
@@ -1455,10 +1287,7 @@ void ETH_SetDMATxDescOwnBit(ETH_DMADESCTypeDef *DMATxDesc)
   * @retval None
   */
 void ETH_DMATxDescTransmitITConfig(ETH_DMADESCTypeDef *DMATxDesc, FunctionalState NewState)
-{
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
-  
+{  
   if (NewState != DISABLE)
   {
     /* Enable the DMA Tx Desc Transmit interrupt */
@@ -1482,9 +1311,6 @@ void ETH_DMATxDescTransmitITConfig(ETH_DMADESCTypeDef *DMATxDesc, FunctionalStat
   */
 void ETH_DMATxDescFrameSegmentConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_t DMATxDesc_FrameSegment)
 {
-  /* Check the parameters */
-  assert_param(IS_ETH_DMA_TXDESC_SEGMENT(DMATxDesc_FrameSegment));
-  
   /* Selects the DMA Tx Desc Frame segment */
   DMATxDesc->Status |= DMATxDesc_FrameSegment;
 }
@@ -1502,9 +1328,6 @@ void ETH_DMATxDescFrameSegmentConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_t DMA
   */
 void ETH_DMATxDescChecksumInsertionConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_t DMATxDesc_Checksum)
 {
-  /* Check the parameters */
-  assert_param(IS_ETH_DMA_TXDESC_CHECKSUM(DMATxDesc_Checksum));
-  
   /* Set the selected DMA Tx desc checksum insertion control */
   DMATxDesc->Status |= DMATxDesc_Checksum;
 }
@@ -1518,9 +1341,6 @@ void ETH_DMATxDescChecksumInsertionConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_
   */
 void ETH_DMATxDescCRCCmd(ETH_DMADESCTypeDef *DMATxDesc, FunctionalState NewState)
 {
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
-  
   if (NewState != DISABLE)
   {
     /* Enable the selected DMA Tx Desc CRC */
@@ -1541,10 +1361,7 @@ void ETH_DMATxDescCRCCmd(ETH_DMADESCTypeDef *DMATxDesc, FunctionalState NewState
   * @retval None
   */
 void ETH_DMATxDescSecondAddressChainedCmd(ETH_DMADESCTypeDef *DMATxDesc, FunctionalState NewState)
-{
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
-  
+{  
   if (NewState != DISABLE)
   {
     /* Enable the selected DMA Tx Desc second address chained */
@@ -1565,10 +1382,7 @@ void ETH_DMATxDescSecondAddressChainedCmd(ETH_DMADESCTypeDef *DMATxDesc, Functio
   * @retval None
   */
 void ETH_DMATxDescShortFramePaddingCmd(ETH_DMADESCTypeDef *DMATxDesc, FunctionalState NewState)
-{
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
-  
+{  
   if (NewState != DISABLE)
   {
     /* Enable the selected DMA Tx Desc padding for frame shorter than 64 bytes */
@@ -1590,9 +1404,6 @@ void ETH_DMATxDescShortFramePaddingCmd(ETH_DMADESCTypeDef *DMATxDesc, Functional
   */
 void ETH_DMATxDescBufferSizeConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_t BufferSize1, uint32_t BufferSize2)
 {
-  /* Check the parameters */
-  assert_param(IS_ETH_DMATxDESC_BUFFER_SIZE(BufferSize1));
-  assert_param(IS_ETH_DMATxDESC_BUFFER_SIZE(BufferSize2));
   
   /* Set the DMA Tx Desc buffer1 and buffer2 sizes values */
   DMATxDesc->ControlBufferSize |= (BufferSize1 | (BufferSize2 << ETH_DMATXDESC_BUFFER2_SIZESHIFT));
@@ -1626,8 +1437,6 @@ void ETH_DMATxDescBufferSizeConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_t Buffe
 FlagStatus ETH_GetDMARxDescFlagStatus(ETH_DMADESCTypeDef *DMARxDesc, uint32_t ETH_DMARxDescFlag)
 {
   FlagStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ETH_DMARxDESC_GET_FLAG(ETH_DMARxDescFlag));
   if ((DMARxDesc->Status & ETH_DMARxDescFlag) != (uint32_t)RESET)
   {
     bitstatus = SET;
@@ -1659,9 +1468,6 @@ FlagStatus ETH_GetDMARxDescFlagStatus(ETH_DMADESCTypeDef *DMARxDesc, uint32_t ET
 FlagStatus ETH_GetDMAPTPRxDescExtendedFlagStatus(ETH_DMADESCTypeDef *DMAPTPRxDesc, uint32_t ETH_DMAPTPRxDescExtendedFlag)
 {
   FlagStatus bitstatus = RESET;
-
-  /* Check the parameters */
-  assert_param(IS_ETH_DMAPTPRxDESC_GET_EXTENDED_FLAG(ETH_DMAPTPRxDescExtendedFlag));
 
   if ((DMAPTPRxDesc->ExtendedStatus & ETH_DMAPTPRxDescExtendedFlag) != (uint32_t)RESET)
   {
@@ -1706,9 +1512,7 @@ uint32_t ETH_GetDMARxDescFrameLength(ETH_DMADESCTypeDef *DMARxDesc)
   */
 void ETH_DMARxDescReceiveITConfig(ETH_DMADESCTypeDef *DMARxDesc, FunctionalState NewState)
 {
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
-  
+ 
   if (NewState != DISABLE)
   {
     /* Enable the DMA Rx Desc receive interrupt */
@@ -1731,10 +1535,7 @@ void ETH_DMARxDescReceiveITConfig(ETH_DMADESCTypeDef *DMARxDesc, FunctionalState
   * @retval The Receive descriptor frame length.
   */
 uint32_t ETH_GetDMARxDescBufferSize(ETH_DMADESCTypeDef *DMARxDesc, uint32_t DMARxDesc_Buffer)
-{
-  /* Check the parameters */
-  assert_param(IS_ETH_DMA_RXDESC_BUFFER(DMARxDesc_Buffer));
-  
+{  
   if(DMARxDesc_Buffer != ETH_DMARxDesc_Buffer1)
   {
     /* Return the DMA Rx Desc buffer2 size */
@@ -1777,8 +1578,6 @@ uint32_t ETH_GetRxPktSize(ETH_DMADESCTypeDef *DMARxDesc)
 void ETH_EnhancedDescriptorCmd(FunctionalState NewState)
 { 
   __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
   
   if (NewState != DISABLE)
   {
@@ -1863,8 +1662,6 @@ FlagStatus ETH_GetSoftwareResetStatus(void)
 FlagStatus ETH_GetDMAFlagStatus(uint32_t ETH_DMA_FLAG)
 {  
   FlagStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ETH_DMA_GET_IT(ETH_DMA_FLAG));
   if ((ETH->DMASR & ETH_DMA_FLAG) != (uint32_t)RESET)
   {
     bitstatus = SET;
@@ -1898,10 +1695,7 @@ FlagStatus ETH_GetDMAFlagStatus(uint32_t ETH_DMA_FLAG)
   * @retval None
   */
 void ETH_DMAClearFlag(uint32_t ETH_DMA_FLAG)
-{
-  /* Check the parameters */
-  assert_param(IS_ETH_DMA_FLAG(ETH_DMA_FLAG));
-  
+{  
   /* Clear the selected ETHERNET DMA FLAG */
   ETH->DMASR = (uint32_t) ETH_DMA_FLAG;
 }
@@ -1931,10 +1725,7 @@ void ETH_DMAClearFlag(uint32_t ETH_DMA_FLAG)
   * @retval None
   */
 void ETH_DMAITConfig(uint32_t ETH_DMA_IT, FunctionalState NewState)
-{
-  /* Check the parameters */
-  assert_param(IS_ETH_DMA_IT(ETH_DMA_IT));
-  assert_param(IS_FUNCTIONAL_STATE(NewState));  
+{ 
   
   if (NewState != DISABLE)
   {
@@ -1975,8 +1766,6 @@ void ETH_DMAITConfig(uint32_t ETH_DMA_IT, FunctionalState NewState)
 ITStatus ETH_GetDMAITStatus(uint32_t ETH_DMA_IT)
 {  
   ITStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ETH_DMA_GET_IT(ETH_DMA_IT));
   if ((ETH->DMASR & ETH_DMA_IT) != (uint32_t)RESET)
   {
     bitstatus = SET;
@@ -2010,10 +1799,7 @@ ITStatus ETH_GetDMAITStatus(uint32_t ETH_DMA_IT)
   * @retval None
   */
 void ETH_DMAClearITPendingBit(uint32_t ETH_DMA_IT)
-{
-  /* Check the parameters */
-  assert_param(IS_ETH_DMA_IT(ETH_DMA_IT));
-  
+{ 
   /* Clear the selected ETHERNET DMA IT */
   ETH->DMASR = (uint32_t) ETH_DMA_IT;
 }
@@ -2096,10 +1882,7 @@ FlagStatus ETH_GetFlushTransmitFIFOStatus(void)
   * @retval None
   */
 void ETH_DMATransmissionCmd(FunctionalState NewState)
-{ 
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
-  
+{   
   if (NewState != DISABLE)
   {
     /* Enable the DMA transmission */
@@ -2119,10 +1902,7 @@ void ETH_DMATransmissionCmd(FunctionalState NewState)
   * @retval None
   */
 void ETH_DMAReceptionCmd(FunctionalState NewState)
-{ 
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
-  
+{   
   if (NewState != DISABLE)
   {
     /* Enable the DMA reception */
@@ -2146,8 +1926,6 @@ void ETH_DMAReceptionCmd(FunctionalState NewState)
 FlagStatus ETH_GetDMAOverflowStatus(uint32_t ETH_DMA_Overflow)
 {
   FlagStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ETH_DMA_GET_OVERFLOW(ETH_DMA_Overflow));
   
   if ((ETH->DMAMFBOCR & ETH_DMA_Overflow) != (uint32_t)RESET)
   {
@@ -2274,9 +2052,6 @@ uint16_t ETH_ReadPHYRegister(uint16_t PHYAddress, uint16_t PHYReg)
 {
   uint32_t tmpreg = 0;     
   __IO uint32_t timeout = 0;
-  /* Check the parameters */
-  assert_param(IS_ETH_PHY_ADDRESS(PHYAddress));
-  assert_param(IS_ETH_PHY_REG(PHYReg));
   
   /* Get the ETHERNET MACMIIAR value */
   tmpreg = ETH->MACMIIAR;
@@ -2321,9 +2096,6 @@ uint32_t ETH_WritePHYRegister(uint16_t PHYAddress, uint16_t PHYReg, uint16_t PHY
 {
   uint32_t tmpreg = 0;
   __IO uint32_t timeout = 0;
-  /* Check the parameters */
-  assert_param(IS_ETH_PHY_ADDRESS(PHYAddress));
-  assert_param(IS_ETH_PHY_REG(PHYReg));
 
   /* Get the ETHERNET MACMIIAR value */
   tmpreg = ETH->MACMIIAR;
@@ -2367,9 +2139,6 @@ uint32_t ETH_WritePHYRegister(uint16_t PHYAddress, uint16_t PHYReg, uint16_t PHY
 uint32_t ETH_PHYLoopBackCmd(uint16_t PHYAddress, FunctionalState NewState)
 {
   uint16_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_ETH_PHY_ADDRESS(PHYAddress));
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
 
   /* Get the PHY configuration to update it */
   tmpreg = ETH_ReadPHYRegister(PHYAddress, PHY_BCR); 
@@ -2451,8 +2220,6 @@ void ETH_SetWakeUpFrameFilterRegister(uint32_t *Buffer)
 void ETH_GlobalUnicastWakeUpCmd(FunctionalState NewState)
 { 
   __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
 
   if (NewState != DISABLE)
   {
@@ -2484,8 +2251,6 @@ void ETH_GlobalUnicastWakeUpCmd(FunctionalState NewState)
 FlagStatus ETH_GetPMTFlagStatus(uint32_t ETH_PMT_FLAG)
 {
   FlagStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ETH_PMT_GET_FLAG(ETH_PMT_FLAG));
   
   if ((ETH->MACPMTCSR & ETH_PMT_FLAG) != (uint32_t)RESET)
   {
@@ -2507,8 +2272,6 @@ FlagStatus ETH_GetPMTFlagStatus(uint32_t ETH_PMT_FLAG)
 void ETH_WakeUpFrameDetectionCmd(FunctionalState NewState)
 { 
   __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
   
   if (NewState != DISABLE)
   {
@@ -2536,8 +2299,6 @@ void ETH_WakeUpFrameDetectionCmd(FunctionalState NewState)
 void ETH_MagicPacketDetectionCmd(FunctionalState NewState)
 { 
   __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
 
   if (NewState != DISABLE)
   {
@@ -2566,8 +2327,6 @@ void ETH_MagicPacketDetectionCmd(FunctionalState NewState)
 void ETH_PowerDownCmd(FunctionalState NewState)
 { 
   __IO uint32_t tmpreg = 0;
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
   
   if (NewState != DISABLE)
   {
@@ -2624,8 +2383,6 @@ void ETH_MMCCounterHalfPreset(void)
   */
 void ETH_MMCCounterFreezeCmd(FunctionalState NewState)
 {
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
   
   if (NewState != DISABLE)
   {
@@ -2647,8 +2404,6 @@ void ETH_MMCCounterFreezeCmd(FunctionalState NewState)
   */
 void ETH_MMCResetOnReadCmd(FunctionalState NewState)
 {
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
   
   if (NewState != DISABLE)
   {
@@ -2670,8 +2425,6 @@ void ETH_MMCResetOnReadCmd(FunctionalState NewState)
   */
 void ETH_MMCCounterRolloverCmd(FunctionalState NewState)
 {
-  /* Check the parameters */
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
   
   if (NewState != DISABLE)
   {
@@ -2713,9 +2466,6 @@ void ETH_MMCCountersReset(void)
   */
 void ETH_MMCITConfig(uint32_t ETH_MMC_IT, FunctionalState NewState)
 { 
-  /* Check the parameters */
-  assert_param(IS_ETH_MMC_IT(ETH_MMC_IT));  
-  assert_param(IS_FUNCTIONAL_STATE(NewState));
   
   if ((ETH_MMC_IT & (uint32_t)0x10000000) != (uint32_t)RESET)
   {
@@ -2765,8 +2515,6 @@ void ETH_MMCITConfig(uint32_t ETH_MMC_IT, FunctionalState NewState)
 ITStatus ETH_GetMMCITStatus(uint32_t ETH_MMC_IT)
 {
   ITStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ETH_MMC_GET_IT(ETH_MMC_IT)); 
   
   if ((ETH_MMC_IT & (uint32_t)0x10000000) != (uint32_t)RESET)
   {
@@ -2816,10 +2564,7 @@ ITStatus ETH_GetMMCITStatus(uint32_t ETH_MMC_IT)
   * @retval The value of ETHERNET MMC Register value.
   */
 uint32_t ETH_GetMMCRegister(uint32_t ETH_MMCReg)
-{
-  /* Check the parameters */
-  assert_param(IS_ETH_MMC_REGISTER(ETH_MMCReg));
-  
+{  
   /* Return the selected register value */
   return (*(__IO uint32_t *)(ETH_MAC_BASE + ETH_MMCReg));
 }

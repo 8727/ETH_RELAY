@@ -398,6 +398,18 @@
         </Group>
         <Group>
           <GroupName>LIB</GroupName>
+          <Files>
+            <File>
+              <FileName>lan87xxa.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\LIB\lan8720\src\lan87xxa.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\LIB\lan8720\src\stm32f4xx_eth.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Source</GroupName>

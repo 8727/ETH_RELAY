@@ -35,7 +35,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f429_eth_conf.h"
+#include "stm32f4xx_eth_conf.h"
 
 /** @defgroup ETH_Exported_Types
   * @{
