@@ -146,48 +146,11 @@ uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress)
 {
   uint32_t RegValue = 0, tmpreg = 0;
   __IO uint32_t i = 0;
-  RCC_ClocksTypeDef  rcc_clocks;
-  uint32_t hclk = 60000000;
   __IO uint32_t timeout = 0, err = ETH_SUCCESS;
   /*-------------------------------- MAC Config ------------------------------*/
-  /*---------------------- ETHERNET MACMIIAR Configuration -------------------*/
-  /* Get the ETHERNET MACMIIAR value */
-  tmpreg = ETH->MACMIIAR;
-  /* Clear CSR Clock Range CR[2:0] bits */
-  tmpreg &= MACMIIAR_CR_MASK;
-  /* Get hclk frequency value */
-  RCC_GetClocksFreq(&rcc_clocks);
-  hclk = rcc_clocks.HCLK_Frequency;
-  
-  /* Set CR bits depending on hclk value */
-  if((hclk >= 20000000)&&(hclk < 35000000))
-  {
-    /* CSR Clock Range between 20-35 MHz */
-    tmpreg |= (uint32_t)ETH_MACMIIAR_CR_Div16;
-  }
-  else if((hclk >= 35000000)&&(hclk < 60000000))
-  {
-    /* CSR Clock Range between 35-60 MHz */ 
-    tmpreg |= (uint32_t)ETH_MACMIIAR_CR_Div26;
-  }  
-  else if((hclk >= 60000000)&&(hclk < 100000000))
-  {
-    /* CSR Clock Range between 60-100 MHz */ 
-    tmpreg |= (uint32_t)ETH_MACMIIAR_CR_Div42;
-  }  
-  else if((hclk >= 100000000)&&(hclk < 150000000))
-  {
-    /* CSR Clock Range between 100-150 MHz */ 
-    tmpreg |= (uint32_t)ETH_MACMIIAR_CR_Div62;
-  }
-  else /* ((hclk >= 150000000)&&(hclk <= 168000000)) */
-  {
-    /* CSR Clock Range between 150-168 MHz */ 
-    tmpreg |= (uint32_t)ETH_MACMIIAR_CR_Div102;    
-  }
-  
+  /*---------------------- ETHERNET MACMIIAR Configuration -------------------*/  
   /* Write to ETHERNET MAC MIIAR: Configure the ETHERNET CSR Clock Range */
-  ETH->MACMIIAR = (uint32_t)tmpreg;  
+  ETH->MACMIIAR = ((uint32_t)0x00000010);
   /*-------------------- PHY initialization and configuration ----------------*/
   /* Put the PHY in reset mode */
   if(!(ETH_WritePHYRegister(PHYAddress, PHY_BCR, PHY_Reset)))
