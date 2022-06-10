@@ -1,0 +1,14 @@
+
+SN            FFFFFFFF FFFFFFFF FFFFFFFF
+
+HW            4078720C-ipc, 4078720D- diod, 4078720F- tft
+SWPC          FFFFFFFF
+DTSW          FFFFFFFF
+
+MACA          028727xxxxxx
+IPAD          C0A85828
+MASK          FFFFFF00
+GTAD          C0A85801
+
+NTPA          C0A8580B
+NTPB          C0A8580C
