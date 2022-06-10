@@ -12,22 +12,22 @@
    
 /* UserID and Password definition *********************************************/
 #define USERID       "root"
-#define PASSWORD     "root"
+#define PASSWORD     "8727"
 #define LOGIN_SIZE   (15+ sizeof(USERID) + sizeof(PASSWORD))
 
 /* MAC Address definition *****************************************************/
-#define MAC_ADDR0   0
-#define MAC_ADDR1   0
-#define MAC_ADDR2   0
+#define MAC_ADDR0   0x02
+#define MAC_ADDR1   0x87
+#define MAC_ADDR2   0x27
 #define MAC_ADDR3   0 
 #define MAC_ADDR4   0
-#define MAC_ADDR5   2
+#define MAC_ADDR5   0
  
 /* Static IP Address definition ***********************************************/
 #define IP_ADDR0   192
 #define IP_ADDR1   168
 #define IP_ADDR2   88
-#define IP_ADDR3   50
+#define IP_ADDR3   40
    
 /* NETMASK definition *********************************************************/
 #define NETMASK_ADDR0   255
@@ -39,7 +39,7 @@
 #define GW_ADDR0   192
 #define GW_ADDR1   168
 #define GW_ADDR2   88
-#define GW_ADDR3   1  
+#define GW_ADDR3   1
 
 //--------------------------------------------------------------------------------------------------------------------//
 
