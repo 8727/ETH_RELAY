@@ -32,16 +32,8 @@
 	ETH_MII_TX_EN/ETH_RMII_TX_EN -----> PB11
 	ETH_MII_TXD0/ETH_RMII_TXD0 -------> PB12
 	ETH_MII_TXD1/ETH_RMII_TXD1 -------> PB13
-																						*/
+*/
 																	
-
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
-//void ETH_BSP_Config(void);
-//void ETH_EXTERN_GetSpeedAndDuplex(uint32_t PHYAddress, ETH_InitTypeDef* ETH_InitStruct);
-//void ETH_link_callback(struct netif *netif);
-//void ETH_CheckLinkStatus(uint16_t PHYAddress);
-
 void EthInit(void);
 
 #endif /* LAN87XX_H_H */

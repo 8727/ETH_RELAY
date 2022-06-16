@@ -6,40 +6,27 @@
 #include "sysInit.h"
 
 //--------------------------------------------------------------------------------------------------------------------//
-#define USER_FLASH_FIRST_PAGE_ADDRESS 0x08008000 /* Only as example see comment */
-#define USER_FLASH_LAST_PAGE_ADDRESS  0x080E0000
-#define USER_FLASH_END_ADDRESS        0x080FFFFF  
    
 /* UserID and Password definition *********************************************/
-#define USERID       "root"
-#define PASSWORD     "8727"
+#define USERID													"root"
+#define PASSWORD												"8727"
 #define LOGIN_SIZE   (15+ sizeof(USERID) + sizeof(PASSWORD))
 
-/* MAC Address definition *****************************************************/
-#define MAC_ADDR0   0x02
-#define MAC_ADDR1   0x87
-#define MAC_ADDR2   0x27
-#define MAC_ADDR3   0 
-#define MAC_ADDR4   0
-#define MAC_ADDR5   0
- 
-/* Static IP Address definition ***********************************************/
-#define IP_ADDR0   192
-#define IP_ADDR1   168
-#define IP_ADDR2   88
-#define IP_ADDR3   40
-   
-/* NETMASK definition *********************************************************/
-#define NETMASK_ADDR0   255
-#define NETMASK_ADDR1   255
-#define NETMASK_ADDR2   255
-#define NETMASK_ADDR3   0
+#define MAX_DHCP_TRIES        					0x04
 
-/* Gateway Address definition *************************************************/
-#define GW_ADDR0   192
-#define GW_ADDR1   168
-#define GW_ADDR2   88
-#define GW_ADDR3   1
+#define SN                              
+#define HW															0x4078720D
+#define SWPC														0x00000001
+#define SWDT
+
+#define MACA														0x028727  //028727xxxxxx
+#define DHCP														0x00004F4E //on
+#define IPAD														0xC0A85828
+#define MASK														0xFFFFFF00
+#define GWAD														0xC0A85801
+
+#define NTPA														0xC0A8580B
+#define NTPB														0xC0A8580C
 
 //--------------------------------------------------------------------------------------------------------------------//
 
